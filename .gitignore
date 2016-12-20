@@ -1,7 +1,7 @@
 *.npy
 *.pyc
 
-*.csv
+*.csv*
 *.swp
 *.DS_Store
 */.DS_Store
