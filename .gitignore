@@ -1,0 +1,11 @@
+*.npy
+*.pyc
+
+*.csv
+*.swp
+*.DS_Store
+*/.DS_Store
+*/nohup.out
+
+ori_data/*
+info/*
