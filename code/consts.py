@@ -1,6 +1,6 @@
 # coding: utf-8
 
-BASE_DIR = '/Users/gaoshiyu/desktop/LB/Datasets'
+BASE_DIR = '/home/gaoshiyu/Datasets'
 
 SPECIES = ['human', 'fly', 'worm']
 
