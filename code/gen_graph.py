@@ -5,7 +5,7 @@ from consts import GRAPH_FILE, SPECIES, NPY_FILE, BASE_DIR
 from Alg.pearson import Pearson as _P
 
 
-def get_pearson_matrix(data_arr, res_arr, savefn=None, ret_err=False, test=False):
+def get_pearson_matrix(data_arr, res_arr, savefn=None, ret_err=False):
     errs = []
     assert res_arr.shape == (data_arr.shape[0],
                              data_arr.shape[0])
