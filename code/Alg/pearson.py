@@ -4,25 +4,49 @@ from numpy import *
 class Pearson(object):
 
     @classmethod
-    def Pearson(cls, vec1, vec2):
-        cov = cls.Cov(vec1, vec2)
-        var1, var2 = map(cls.Var, [vec1, vec2])
-        prsn = cov / sqrt(var1 * var2)
-        return prsn
+    def Exp(cls, arr):
+        # 期望
+        # arr: vec / 2darray
+        d = arr.ndim - 1  # 最高一维
+        return add.reduce(arr, d) / arr.shape[d]
 
     @classmethod
-    def Exp(cls, vec):
-        return add.reduce(vec) / vec.shape[0]
+    def Var(cls, arr=None, E=None, E_2=None):
+        # 方差
+        # arr: vec / 2darray
+        assert arr is not None or (E is not None
+                                   and E_2 is not None)
+        if E is None:
+            E = cls.Exp(arr)
+        if E_2 is None:
+            E_2 = cls.Exp(arr ** 2)
+        return E_2 - E ** 2
 
     @classmethod
-    def Var(cls, vec):
-        E = cls.Exp(vec)
-        return cls.Exp((vec - E) ** 2)  # 方差
+    def Sd(cls, arr=None, E=None, E_2=None):
+        # 标准差
+        Var = cls.Var(arr, E, E_2)
+        return sqrt(Var)
 
     @classmethod
-    def Cov(cls, vec1, vec2):
-        assert vec1.shape[0] == vec2.shape[0]
-        mult = vec1 * vec2
-        E1, E2 = map(cls.Exp, [vec1, vec2])
-        cov = cls.Exp(mult) - E1 * E2
-        return cov
+    def PearsonMat(cls, arr, fill=True, ret_err=False):
+        # fill: fill the symmetric matrix
+        # ret_err: return error log
+        errs = []
+        E = cls.Exp(arr)
+        # Var = cls.Var(arr, E=E)
+        Sd = cls.Sd(arr, E=E)
+        res_arr = zeros([arr.shape[0], arr.shape[0]])
+        for i in range(arr.shape[0]-1):
+            for j in range(i+1, arr.shape[0]):
+                try:
+                    E_i_j = cls.Exp(arr[i] * arr[j])
+                    # r = (E_i_j - E[i] * E[j]) / sqrt((Var[i] * Var[j]))
+                    r = (E_i_j - E[i] * E[j]) / (Sd[i] * Sd[j])
+                except:
+                    errs.append([i, j])
+                res_arr[i][j] = r
+                if fill: res_arr[j][i] = r
+        if ret_err:
+            return res_arr, errs
+        return res_arr

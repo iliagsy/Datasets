@@ -6,6 +6,8 @@
 *.DS_Store
 */.DS_Store
 */nohup.out
+nohup.out
+*.test*
 
 ori_data/*
 info/*
