@@ -17,5 +17,6 @@ def keep_top(species, d=5, savefn=None):
         val_lst = [t[1] for t in kv_lst]
         PM[i] = array(val_lst)
     if savefn:
+        savetxt(savefn, PM)
         save(savefn, PM)
     return PM
