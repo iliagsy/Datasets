@@ -3,7 +3,7 @@ from numpy import *
 
 from consts import GRAPH_FILE_GZ, SPECIES, FINAL_FILE
 
-def keep_top(species, d=5, savefn=False):
+def keep_top(species, d=5, savefn=None):
     PM = loadtxt(GRAPH_FILE_GZ[species])  # Pearson Matrix
     for i in range(PM.shape[0]):
         kv_lst = sorted(
