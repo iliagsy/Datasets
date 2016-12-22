@@ -20,3 +20,6 @@ def keep_top(species, d=5, savefn=None):
         savetxt(savefn, PM)
         save(savefn, PM)
     return PM
+
+for sp in SPECIES:
+    keep_top(sp, savefn=FINAL_FILE[sp])
