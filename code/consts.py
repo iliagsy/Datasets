@@ -19,3 +19,9 @@ GRAPH_FILE = dict(zip(
     map(lambda s: BASE_DIR + _fn_fmt.replace('cut_', 'graph_') % s,
         SPECIES)
 ))
+
+GRAPH_FILE_GZ = dict(zip(
+    SPECIES,
+    map(lambda sp: GRAPH_FILE[sp] + '.gz',
+        SPECIES)
+))
