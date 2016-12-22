@@ -21,5 +21,6 @@ def keep_top(species, d=5, savefn=None):
         save(savefn, PM)
     return PM
 
-for sp in SPECIES:
-    keep_top(sp, savefn=FINAL_FILE[sp])
+# for sp in SPECIES:
+sp = ''
+keep_top(sp, savefn=FINAL_FILE[sp])
