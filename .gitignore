@@ -1,5 +1,6 @@
-*.npy
+*.npy*
 *.pyc
+*.gz
 
 *.csv*
 *.swp
