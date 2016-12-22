@@ -17,6 +17,10 @@ def keep_top(species, PM=None, d=5, savefn=None):
         kv_arr = array(sorted(kv_arr_.tolist(), key=lambda t: t[0]))
         val_arr = kv_arr[:, 1]
         PM[i] = val_arr
+    for i in range(PM.shape[0]-1):
+        for j in range(i+1, PM.shape[0]):
+            if logical_xor(PM[i, j] < 10**(-14), PM[j, i] < 10**(-14)):
+                PM[i, j] = PM[j, i] = PM[i, j] + PM[j, i]
     if savefn:
         savetxt(savefn, PM)
         save(savefn, PM)
