@@ -27,5 +27,5 @@ def keep_top(species, PM=None, d=5, savefn=None):
     return PM
 
 # for sp in SPECIES:
-sp = 'human'
+sp = ''
 keep_top(sp, savefn=FINAL_FILE[sp])
