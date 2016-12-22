@@ -25,3 +25,16 @@ GRAPH_FILE_GZ = dict(zip(
     map(lambda sp: GRAPH_FILE[sp] + '.gz',
         SPECIES)
 ))
+
+FINAL_FILE = dict(zip(
+    SPECIES,
+    map(lambda s: (BASE_DIR
+                   + _fn_fmt.replace('cut_', 'final_').replace('.csv', '') % s),
+        SPECIES)
+))
+
+FINAL_NPY = dict(zip(
+    SPECIES,
+    map(lambda sp: FINAL_FILE[sp] + '.npy',
+        SPECIES)
+))
