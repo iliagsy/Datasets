@@ -19,7 +19,7 @@ def keep_top(species, PM=None, d=5, savefn=None):
         PM[i] = val_arr
     for i in range(PM.shape[0]-1):
         for j in range(i+1, PM.shape[0]):
-            if logical_xor(PM[i, j] < 10**(-14), PM[j, i] < 10**(-14)):
+            if not abs(PM[i, j] - PM[j, i]) < 10**(-14):
                 PM[i, j] = PM[j, i] = PM[i, j] + PM[j, i]
     if savefn:
         savetxt(savefn, PM)
@@ -27,5 +27,5 @@ def keep_top(species, PM=None, d=5, savefn=None):
     return PM
 
 # for sp in SPECIES:
-sp = ''
+sp = 'human'
 keep_top(sp, savefn=FINAL_FILE[sp])
