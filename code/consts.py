@@ -38,3 +38,5 @@ FINAL_NPY = dict(zip(
     map(lambda sp: FINAL_FILE[sp] + '.npy',
         SPECIES)
 ))
+
+GRAPH_PRF = BASE_DIR + '/graph_profile.txt'
