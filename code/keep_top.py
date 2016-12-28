@@ -22,7 +22,7 @@ def keep_top(species, PM=None, d=5, savefn=None, ret_arr=True):
         val_arr = kv_arr[:, 1]
         PM_f[i] = (val_arr != 0)
     # PM_b: PM binary, i.e. complemented PM_f
-    PM_b = PM_f.transpose() or PM_f
+    PM_b = logical_or(PM_f.transpose(), PM_f)
     nE = sum(PM_b); nV = PM.shape[0]
     res = {
         'd': d,
