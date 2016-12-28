@@ -48,7 +48,7 @@ for d in (5, 8, 10):
         res_l = []
         data = keep_top(sp, d=d, ret_arr=False)
         data = map(data.get, ['d','species','nE','nV','nE_per_V'])
-        s = '%4d%10s%8d%8d%8.4f' % data
+        s = '%4d%10s%8d%8d%8.4f' % tuple(data)
         res_l.append(s)
     with open(GRAPH_PRF, 'w') as fh:
         fh.write('\n'.join(res_l))
