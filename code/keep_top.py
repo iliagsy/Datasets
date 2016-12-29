@@ -38,9 +38,9 @@ def keep_top(species, PM=None, d=5, savefn=None, ret_arr=True):
     return res
 
 if __name__ == '__main__':
+    res_l = []
     for d in (5, 8, 10):
         for sp in SPECIES:
-            res_l = []
             data = keep_top(sp, d=d, ret_arr=False)
             data = map(data.get, ['d','species','nE','nV','nE_per_V'])
             s = '%4d%10s%8d%8d%8.4f' % tuple(data)  # 不可以是list
