@@ -45,5 +45,5 @@ if __name__ == '__main__':
             data = map(data.get, ['d','species','nE','nV','nE_per_V'])
             s = '%4d%10s%8d%8d%8.4f' % tuple(data)  # 不可以是list
             res_l.append(s)
-        with open(GRAPH_PRF, 'w') as fh:
-            fh.write('\n'.join(res_l))
+    with open(GRAPH_PRF, 'w') as fh:
+        fh.write('\n'.join(res_l))
