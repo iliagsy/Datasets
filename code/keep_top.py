@@ -41,7 +41,7 @@ def keep_top(species, PM=None, d=5, savefn=None, ret_arr=True):
 if __name__ == '__main__':
     res_l = []
     for sp in SPECIES:
-        PM = loadtxt(GRAPH_FILE_GZ[species])  # only load once for different d
+        PM = loadtxt(GRAPH_FILE_GZ[sp])  # only load once for different d
         for d in (5, 8, 10):
             data = keep_top(sp, d=d, PM=PM, ret_arr=False)
             data = map(data.get, ['d','species','nE','nV','nE_per_V'])
