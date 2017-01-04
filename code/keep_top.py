@@ -48,4 +48,5 @@ if __name__ == '__main__':
             s = '%4d%10s%8d%8d%8.4f' % tuple(data)  # 不可以是list
             res_l.append(s)
     with open(GRAPH_PRF, 'w') as fh:
+        fh.write('%4s%10s%8s%8s%8s\n' % ('d','species','nE','nV','nE_per_V'))
         fh.write('\n'.join(res_l))
