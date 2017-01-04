@@ -6,6 +6,7 @@ from consts import GRAPH_FILE_GZ, SPECIES, FINAL_FILE, GRAPH_PRF
 
 def keep_top(species, PM=None, d=5, savefn=None, ret_arr=True):
     # PM: 2darray
+    # if ret_arr==False: only return metadata
     if PM is None:
         PM = loadtxt(GRAPH_FILE_GZ[species])  # Pearson Matrix
     # keep top d
@@ -17,7 +18,10 @@ def keep_top(species, PM=None, d=5, savefn=None, ret_arr=True):
         PM_f[i, sidx[d:]] = False
     # PM_b: PM binary, i.e. complemented PM_f
     PM_b = logical_or(PM_f.transpose(), PM_f)
-    nE = sum(PM_b) / 2; nV = PM.shape[0]
+    # calc new PM, with PM_b as condition
+    # numpy.where(condition[, x, y]) -- Return elements, either from x or y, depending on condition.
+    PM = where(PM_b, PM, zeros_like(PM))  # array-wise `c ? a : b`
+    nE = sum(abs(PM) > 10**(-14)); nV = PM.shape[0]
     res = {
         'd': d,
         'species': species,
@@ -27,9 +31,6 @@ def keep_top(species, PM=None, d=5, savefn=None, ret_arr=True):
     }
     if not ret_arr and savefn is None:
         return res
-    # calc new PM, with PM_b as condition
-    # numpy.where(condition[, x, y]) -- Return elements, either from x or y, depending on condition.
-    PM = where(PM_b, PM, zeros_like(PM))  # array-wise `c ? a : b`
     # wrap up
     if savefn:
         savetxt(savefn, PM)
