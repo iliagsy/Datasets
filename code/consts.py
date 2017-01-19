@@ -1,6 +1,6 @@
 # coding: utf-8
 
-BASE_DIR = '/home/gaoshiyu/Datasets'
+BASE_DIR = '/Users/gaoshiyu/desktop/LB/Datasets'
 BASE_DIR1 = '/Volumes/GSY_SS/LB/'
 
 SPECIES = ['human', 'fly', 'worm']
@@ -17,7 +17,7 @@ NPY_FILE = dict(zip(
 
 GRAPH_FILE = dict(zip(
     SPECIES,
-    map(lambda s: BASE_DIR1 + _fn_fmt.replace('cut_', 'graph_') % s,
+    map(lambda s: BASE_DIR + _fn_fmt.replace('cut_', 'graph_') % s,
         SPECIES)
 ))
 
@@ -41,3 +41,9 @@ FINAL_NPY = dict(zip(
 ))
 
 GRAPH_PRF = BASE_DIR + '/graph_profile.txt'
+_GRAPH_PRF = dict(zip(
+    SPECIES,
+    map(lambda s: (BASE_DIR
+                   + '/graph_profile_%s.txt' % s),
+        SPECIES)
+))

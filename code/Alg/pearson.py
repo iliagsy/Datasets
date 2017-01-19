@@ -30,7 +30,7 @@ class Pearson(object):
 
     @classmethod
     def PearsonMat(cls, arr, fill=True, ret_err=False):
-        # fill: fill the symmetric matrix
+        # fill: fill the matrix, making it symmetric
         # ret_err: return error log
         errs = []
         E = cls.Exp(arr)

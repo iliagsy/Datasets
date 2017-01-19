@@ -14,7 +14,7 @@ def get_pearson_matrix(data_arr, savefn=None, ret_err=False):
 
 def gen_graph(species, test=False):
     assert species.lower() in SPECIES
-    data_arr = load(NPY_FILE[species])
+    data_arr = load(NPY_FILE[species.lower()])
     if test:
         data_arr = data_arr[:1000]
     test_str = '.test' if test else ''
