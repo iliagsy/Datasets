@@ -1,4 +1,5 @@
 # coding: utf-8
+# 实现了三个计算PearsonMat的方法：PearsonMat, PearsonMat0, PearsonMat1
 import numpy as np
 from numpy import *
 from scipy.stats import pearsonr
@@ -10,7 +11,7 @@ class Pearson(object):
         # 期望
         # arr: vec / 2darray
         d = arr.ndim - 1  # 最高一维
-        return add.reduce(arr, d) / arr.shape[d]
+        return np.mean(arr, axis=d)
 
     @classmethod
     def Var(cls, arr=None, E=None, E_2=None):
@@ -54,7 +55,7 @@ class Pearson(object):
 
 
     @classmethod
-    def H(cls, arr):
+    def _H(cls, arr):
         SX = add.reduce(arr, axis=1)
         SX.shape = (1, SX.shape[0])  # 0-dim array -> 1-dim array
         S = np.dot(SX.T, SX)
@@ -65,7 +66,7 @@ class Pearson(object):
 
     @classmethod
     def PearsonMat1(cls, arr):
-        H = cls.H(arr)
+        H = cls._H(arr)
         D = np.diag(H)
         D.shape = (1, D.shape[0])
         P = H / sqrt(np.dot(D.T, D))

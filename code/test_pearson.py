@@ -5,7 +5,7 @@ from Alg.pearson import Pearson as _P
 from consts import BASE_DIR, NPY_FILE
 import json
 A = load(NPY_FILE['human'])
-A = A[:2, :]
+A = A[:5, :]
 
 print A
 savetxt('p1.txt', _P.PearsonMat1(A))

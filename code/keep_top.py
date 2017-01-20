@@ -20,14 +20,8 @@ def keep_top(species, PM=None, dl=[5], fnl=None, ret_arr=True):
         PM = loadtxt(GRAPH_FILE_GZ[species])  # Pearson Matrix
     nV = PM.shape[0]
     for d,savefn in zip(dl, fnl):
-        # PM_f: PM-filter -- bool type
-        PM_f = ndarray(shape=PM.shape, dtype=bool)
-        for i in range(PM.shape[0]):
-            sidx = abs(PM[i]).argsort()[::-1]  # sorted index array
-            PM_f[i, sidx[:d]] = True
-            PM_f[i, sidx[d:]] = False
-            PM_f[i, abs(PM[i]) < 10**(-14)] = False
-        nE = sum(logical_or(PM_f.T, PM_f))
+        PM_f = keep_top_d(PM, d)
+        nE = sum(PM_f!=0)
         prf = {
             'd': d,
             'species': species,
@@ -36,24 +30,31 @@ def keep_top(species, PM=None, dl=[5], fnl=None, ret_arr=True):
             'nE_per_V': float(nE) / nV
         }
         if not ret_arr and not savefn:
-            prfs.append(prf); del PM_f; continue
-
-        # calc new PM
-        PM = where(logical_or(PM_f.T, PM_f),
-                   PM,
-                   zeros_like(PM))   # array-wise `c ? a : b`
-        del PM_f
-        # wrap up
+            prfs.append(prf); continue
         if savefn:
-            savetxt(savefn, PM); save(savefn, PM)
-        prf.update({'PM': PM})
+            savetxt(savefn, PM_f); save(savefn, PM_f)
+        prf.update({'PM': PM_f})
         prfs.append(prf)
-
     return prfs
 
 
+def keep_top_d(G, d):
+    for r in range(G.shape[0]):
+        idxs = abs(G[r]).argsort()[::-1]
+        G[r, idxs[d:]] = 0.
+        G[r, abs(G[r]) < 10**(-14)] = 0.
+    for r in range(G.shape[0]):
+        for c in range(r+1, G.shape[0]):
+            u,l = G[r,c], G[c,r]
+            if u != 0 and l == 0:
+                G[c,r] = u
+            elif l != 0 and u == 0:
+                G[r,c] = l
+    return G
+
+
 def gen_graph_profile():
-    skip =  []
+    skip = []
     for sp in SPECIES:
         if sp in skip: continue
         prf = keep_top(sp, dl=[5,8,10], ret_arr=False)
