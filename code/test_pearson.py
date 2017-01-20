@@ -1,16 +1,13 @@
 # coding: utf-8
 
-from Alg.pearson import Pearson
+from numpy import *
+from Alg.pearson import Pearson as _P
 from consts import BASE_DIR, NPY_FILE
 import json
 A = load(NPY_FILE['human'])
-errs = []
-for i in range(A.shape[0]):
-    for j in range(i+1, A.shape[0]):
-        try:
-            p = Pearson.Pearson(A[i], A[j])
-        except:
-            errs.append([i, j])
+A = A[:2, :]
 
-with open(BASE_DIR + '/code/err_log.txt', 'w') as fh:
-    json.dumps(errs, indent=4)
+print A
+savetxt('p1.txt', _P.PearsonMat1(A))
+savetxt('p0.txt', _P.PearsonMat0(A))
+savetxt('p.txt', _P.PearsonMat(A))
