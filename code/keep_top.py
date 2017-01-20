@@ -3,10 +3,25 @@ import numpy as np
 import json
 from numpy import *
 
-from consts import GRAPH_FILE_GZ, SPECIES, FINAL_FILE, GRAPH_PRF
+from consts import GRAPH_FILE_GZ, SPECIES, GRAPH_PRF
+
+
+def keep_top_d(G_, d):
+    G = np.copy(G_)
+    for r in range(G.shape[0]):
+        idxs = abs(G[r]).argsort()[::-1]
+        G[r, idxs[d:]] = 0.
+        G[r, abs(G[r]) < 10**(-14)] = 0.
+    for r in range(G.shape[0]):
+        for c in range(r+1, G.shape[0]):
+            if G[c, r] != 0:
+                G[r, c] = G[c, r]
+            G[c, r] = G[r, c]
+    return G
+
 
 def keep_top(species, PM=None, dl=[5], fnl=None, ret_arr=True):
-    # PM: 2darray
+    # PM: 2darray, Pearson Matrix
     # if ret_arr = False, only return metadata
     if fnl is None:
         fnl = []
@@ -36,21 +51,6 @@ def keep_top(species, PM=None, dl=[5], fnl=None, ret_arr=True):
         prf.update({'PM': PM_f})
         prfs.append(prf)
     return prfs
-
-
-def keep_top_d(G, d):
-    for r in range(G.shape[0]):
-        idxs = abs(G[r]).argsort()[::-1]
-        G[r, idxs[d:]] = 0.
-        G[r, abs(G[r]) < 10**(-14)] = 0.
-    for r in range(G.shape[0]):
-        for c in range(r+1, G.shape[0]):
-            u,l = G[r,c], G[c,r]
-            if u != 0 and l == 0:
-                G[c,r] = u
-            elif l != 0 and u == 0:
-                G[r,c] = l
-    return G
 
 
 def gen_graph_profile():
