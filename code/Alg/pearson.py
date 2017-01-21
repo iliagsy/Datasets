@@ -4,8 +4,9 @@ import numpy as np
 from numpy import *
 from scipy.stats import pearsonr
 
-class Pearson(object):
+np.seterr(invalid='raise')
 
+class Pearson(object):
     @classmethod
     def Exp(cls, arr):
         # 期望
@@ -32,32 +33,28 @@ class Pearson(object):
         return sqrt(Var)
 
     @classmethod
-    def PearsonMat0(cls, arr, fill=True, ret_err=False):
-        # fill: fill the matrix, making it symmetric
-        # ret_err: return error log
-        errs = []
+    def PearsonMat0(cls, arr, fill=True):
+    # fill: fill the matrix, making it symmetric
         E = cls.Exp(arr)
-        # Var = cls.Var(arr, E=E)
         Sd = cls.Sd(arr, E=E)
         res_arr = zeros([arr.shape[0], arr.shape[0]])
         for i in range(arr.shape[0]):
             for j in range(i, arr.shape[0]):
+                E_i_j = cls.Exp(arr[i] * arr[j])
                 try:
-                    E_i_j = cls.Exp(arr[i] * arr[j])
                     r = (E_i_j - E[i] * E[j]) / (Sd[i] * Sd[j])
+                    # RuntimeWarning: invalid value encountered in double_scalars
                 except:
-                    errs.append([i, j])
+                    print i, j, r
                 res_arr[i][j] = r
                 if fill: res_arr[j][i] = r
-        if ret_err:
-            return res_arr, errs
         return res_arr
 
 
     @classmethod
     def _H(cls, arr):
         SX = add.reduce(arr, axis=1)
-        SX.shape = (1, SX.shape[0])  # 0-dim array -> 1-dim array
+        SX.shape = (1, SX.shape[0])  # 1-dim array -> 2-dim array
         S = np.dot(SX.T, SX)
         N = arr.shape[1]
         H = np.dot(arr, arr.T) - S / N
@@ -66,6 +63,7 @@ class Pearson(object):
 
     @classmethod
     def PearsonMat1(cls, arr):
+    # 矩阵计算
         H = cls._H(arr)
         D = np.diag(H)
         D.shape = (1, D.shape[0])
@@ -74,7 +72,8 @@ class Pearson(object):
 
 
     @classmethod
-    def PearsonMat(cls, arr, fill=True, ret_err=False, ret_p=False):
+    def PearsonMat(cls, arr, fill=True, ret_p=False):
+    # 内置的pearsonr函数
         res_arr = zeros([arr.shape[0], arr.shape[0]])
         p = zeros([arr.shape[0], arr.shape[0]])
         for i in range(arr.shape[0]):

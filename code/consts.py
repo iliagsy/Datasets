@@ -3,7 +3,7 @@
 BASE_DIR = '/Users/gaoshiyu/desktop/LB/Datasets'
 BASE_DIR1 = '/Volumes/GSY_SS/LB/'
 
-SPECIES = ['fly', 'human', 'worm']
+SPECIES = ['fly', 'worm', 'human']
 
 _fn_fmt = '/cut_%s_gene.csv'
 HM_FILE, FLY_FILE, WORM_FILE = map(lambda s: BASE_DIR + _fn_fmt % s,
@@ -40,10 +40,10 @@ FINAL_NPY = dict(zip(
         SPECIES)
 ))
 
-_GRAPH_PRF = BASE_DIR + '/graph_profile.txt'
+_GRAPH_PRF = BASE_DIR + '/profile_graph.txt'
 GRAPH_PRF = dict(zip(
     SPECIES,
     map(lambda s: (BASE_DIR
-                   + '/graph_profile_%s.txt' % s),
+                   + '/profile_graph_%s.txt' % s),
         SPECIES)
 ))

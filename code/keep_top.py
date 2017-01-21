@@ -9,6 +9,7 @@ from consts import GRAPH_FILE, SPECIES, GRAPH_PRF
 def keep_top_d(G_, d):
     G = np.copy(G_)
     for r in range(G.shape[0]):
+        assert G[r, r] == 0.
         idxs = abs(G[r]).argsort()[::-1]
         G[r, idxs[d:]] = 0.
         G[r, abs(G[r]) < 10**(-14)] = 0.

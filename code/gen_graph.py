@@ -5,25 +5,23 @@ from consts import GRAPH_FILE, SPECIES, NPY_FILE, BASE_DIR
 from Alg.pearson import Pearson as _P
 
 
-def get_pearson_matrix(data_arr, savefn=None, ret_err=False):
-    t = _P.PearsonMat(data_arr, ret_err=ret_err)
+def get_graph_matrix(data_arr, savefn=None):
+# a wrapper
+    arr = _P.PearsonMat(data_arr)
+    for r in range(arr.shape[0]):
+        arr[r, r] = 0.
     if savefn:
-        savetxt(savefn, t if not isinstance(t, tuple) else t[0])
-    return t
+        savetxt(savefn, arr)
+    return arr
 
 
-def gen_graph(species, test=False):
+def gen_graph(species):
     assert species.lower() in SPECIES
     data_arr = load(NPY_FILE[species.lower()])
-    if test:
-        data_arr = data_arr[:1000]
-    test_str = '.test' if test else ''
-    res_arr, errs = get_pearson_matrix(data_arr,
-                                       savefn=GRAPH_FILE[species] + test_str,
-                                       ret_err=True)
-    with open(BASE_DIR + '/code/err_log_%s%s.txt' % (species, test_str), 'w') as fh:
-        fh.write(json.dumps(errs, indent=4))
+    res_arr = get_pearson_matrix(data_arr,
+                                 savefn=GRAPH_FILE[species] + test_str)
 
 
-# for sp in SPECIES:
-gen_graph('human', test=False)
+if __name__ == '__main__':
+    for sp in SPECIES:
+        gen_graph(sp)
