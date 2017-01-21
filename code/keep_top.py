@@ -3,7 +3,7 @@ import numpy as np
 import json
 from numpy import *
 
-from consts import GRAPH_FILE_GZ, SPECIES, GRAPH_PRF
+from consts import GRAPH_FILE, SPECIES, GRAPH_PRF
 
 
 def keep_top_d(G_, d):
@@ -32,7 +32,7 @@ def keep_top(species, PM=None, dl=[5], fnl=None, ret_arr=True):
 
     prfs = []
     if PM is None:
-        PM = loadtxt(GRAPH_FILE_GZ[species])  # Pearson Matrix
+        PM = loadtxt(GRAPH_FILE[species])  # Pearson Matrix
     nV = PM.shape[0]
     for d,savefn in zip(dl, fnl):
         PM_f = keep_top_d(PM, d)
