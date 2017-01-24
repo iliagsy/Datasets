@@ -1,4 +1,5 @@
 # coding: utf-8
+import numpy as np
 
 BASE_DIR = '/Users/gaoshiyu/desktop/LB/Datasets'
 BASE_DIR1 = '/Volumes/GSY_SS/LB/'
@@ -21,6 +22,12 @@ GRAPH_FILE = dict(zip(
         SPECIES)
 ))
 
+GRAPH_FILE_NPY = dict(zip(
+    SPECIES,
+    map(lambda s: GRAPH_FILE[s].replace('.csv', '.npy'),
+        SPECIES)
+))
+
 GRAPH_FILE_GZ = dict(zip(
     SPECIES,
     map(lambda sp: GRAPH_FILE[sp] + '.gz',
@@ -40,10 +47,20 @@ FINAL_NPY = dict(zip(
         SPECIES)
 ))
 
-_GRAPH_PRF = BASE_DIR + '/profile_graph.txt'
+_GRAPH_PRF = BASE_DIR + '/profile_graph.json'
 GRAPH_PRF = dict(zip(
     SPECIES,
     map(lambda s: (BASE_DIR
-                   + '/profile_graph_%s.txt' % s),
+                   + '/profile_graph_%s.json' % s),
         SPECIES)
 ))
+
+ZIDX_FILE = dict(zip(
+    SPECIES,
+    map(lambda s: BASE_DIR + '/zidx_{}'.format(s),
+        SPECIES)
+))
+
+ZIDX = {}
+for sp in SPECIES:
+    ZIDX[sp] = np.load(ZIDX_FILE[sp]+'.npy').tolist()

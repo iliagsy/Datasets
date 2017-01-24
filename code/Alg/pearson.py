@@ -42,10 +42,13 @@ class Pearson(object):
             for j in range(i, arr.shape[0]):
                 E_i_j = cls.Exp(arr[i] * arr[j])
                 try:
-                    r = (E_i_j - E[i] * E[j]) / (Sd[i] * Sd[j])
-                    # RuntimeWarning: invalid value encountered in double_scalars
+                    c = (E_i_j - E[i] * E[j])
+                    p = (Sd[i] * Sd[j])
+                    r = c / p
                 except:
-                    print i, j, r
+                    print c, p, i, j, r, Sd[i], Sd[j], arr[j]
+                    exit()
+                # RuntimeWarning: invalid value encountered in double_scalars
                 res_arr[i][j] = r
                 if fill: res_arr[j][i] = r
         return res_arr
