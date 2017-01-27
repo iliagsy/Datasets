@@ -1,4 +1,5 @@
 *.npy*
+*.npz
 *.pyc
 *.gz
 *.txt
