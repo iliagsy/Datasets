@@ -27,8 +27,7 @@ class CGC(object):
                 Xi = H.dot(H.T).dot(H)
                 for j in range(d):
                     if j == i: continue
-                    small = min(i, j)
-                    large = max(i, j)
+                    small, large = min(i, j), max(i, j)
                     Lambda = self.lambda_dct.get((small, large))
                     S = self.S_dct.get((small, large)), zeros_like(Xi))
                     if j < i:
@@ -57,15 +56,14 @@ class CGC(object):
                     S = self.S_dct.get((small, large)), zeros_like(Xi))
                     # increment Xi
                     if j < i:
-                        F = H
+                        F1 = H
                     elif j > i:
-                        F = S.T.dot(S).dot(H)
-                    Xi += Lambda * F.dot(F.T).dot(H)
-                    # increment Psi
-                    if j > i:
+                        F1 = S.T.dot(S).dot(H)
                         S = S.T
-                    F = S.dot(self.H_lst[j])
-                    Psi += Lambda * F.dot(F.T).dot(H)
+                    Xi += Lambda * F1.dot(F1.T).dot(H)
+                    # increment Psi
+                    F2 = S.dot(self.H_lst[j])
+                    Psi += Lambda * F2.dot(F2.T).dot(H)
                 self.H_lst[i] = H * (Psi / Xi)**(1/4)
                 err += mean(abs(H - self.H_lst[i]))
             if err < 10**(-6):
