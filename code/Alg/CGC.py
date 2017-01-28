@@ -27,9 +27,9 @@ class CGC(object):
                 Xi = H.dot(H.T).dot(H)
                 for j in range(d):
                     if j == i: continue
-                    small, large = min(i, j), max(i, j)
+                    small, large = map(lambda f: f([i, j]), [min, max])
                     Lambda = self.lambda_dct.get((small, large))
-                    S = self.S_dct.get((small, large)), zeros_like(Xi))
+                    S = self.S_dct.get((small, large)), zeros_like(H))
                     if j < i:
                         Xi += Lambda/2 * H
                     elif j > i:
@@ -51,7 +51,7 @@ class CGC(object):
                 Xi = H.dot(H.T).dot(H)
                 for j in range(d):
                     if j == i: continue
-                    small, large = min(i, j), max(i, j)
+                    small, large = map(lambda f: f([i, j]), [min, max])
                     Lambda = self.lambda_dct.get((small, large))
                     S = self.S_dct.get((small, large)), zeros_like(Xi))
                     # increment Xi
