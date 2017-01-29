@@ -78,8 +78,10 @@ def test_zero(species):
 
 
 if __name__ == '__main__':
-    for i in range(len(SPECIES)):
-        for j in range(i+1, len(SPECIES)):
-            sp1, sp2 = SPECIES[i], SPECIES[j]
-            arr = gen_relation_mat([sp1, sp2],
-                                   savefn=REL_MAT_FILE(sp1, sp2))
+    # for i in range(len(SPECIES)):
+    #     for j in range(i+1, len(SPECIES)):
+    #         sp1, sp2 = SPECIES[i], SPECIES[j]
+    #         arr = gen_relation_mat([sp1, sp2],
+    #                                savefn=REL_MAT_FILE(sp1, sp2))
+    for sp in SPECIES:
+        gen_graph(sp)

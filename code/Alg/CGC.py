@@ -9,7 +9,7 @@ class CGC(object):
         assert (len(k_lst) == d
                 and len(S_dct) <= d*(d-1)/2
                 and len(lambda_dct) == d*(d-1)/2)
-        self.A_lst = map(cls._normalizeAffMat, A_lst)
+        self.A_lst = map(cls._normalize, A_lst)
         self.n_lst = map(lambda arr: arr.shape[0], self.A_lst)
         self.S_dct = S_dct
         self.k_lst = k_lst
@@ -57,8 +57,17 @@ class CGC(object):
                     small, large = map(lambda f: f([i, j]), [min, max])
                     Lambda = self.lambda_dct.get((small, large))
                     S = self.S_dct.get((small, large)), zeros_like(Xi))
-                    # 根据不同 loss function 对Psi和Xi进行不同的更新
                     self._updateParam(Xi, Psi, S, Lambda, i, j, lossFunc)
+                    # # increment Xi
+                    # if j < i:
+                    #     F1 = H
+                    # elif j > i:
+                    #     F1 = S.T.dot(S).dot(H)
+                    #     S = S.T
+                    # Xi += Lambda * F1.dot(F1.T).dot(H)
+                    # # increment Psi
+                    # F2 = S.dot(self.H_lst[j])
+                    # Psi += Lambda * F2.dot(F2.T).dot(H)
                 self.H_lst[i] = H * (Psi / Xi)**(1/4)
                 err += mean(abs(H - self.H_lst[i]))
             if err < 10**(-6):
@@ -86,6 +95,6 @@ class CGC(object):
             Psi += Lambda * F2.dot(F2.T).dot(H)
 
     @classmethod
-    def _normalizeAffMat(cls, A):
+    def _normalize(cls, A):
     # normalize affinity matrix by Frobenius norm
         return A / sum(A**2)
