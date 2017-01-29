@@ -1,3 +1,4 @@
+# coding: utf-8
 from numpy import *
 import numpy as np
 
@@ -8,7 +9,7 @@ class CGC(object):
         assert (len(k_lst) == d
                 and len(S_dct) <= d*(d-1)/2
                 and len(lambda_dct) == d*(d-1)/2)
-        self.A_lst = map(cls._normalize, A_lst)
+        self.A_lst = map(cls._normalizeAffMat, A_lst)
         self.n_lst = map(lambda arr: arr.shape[0], self.A_lst)
         self.S_dct = S_dct
         self.k_lst = k_lst
@@ -17,32 +18,34 @@ class CGC(object):
         for i in range(d):
             H = -random.rand(n_lst[i], k_lst[i]) + 1
             self.H_lst.append(H)
+    #
+    # def iter_RSS(self, itertimes=100):
+    #     for itr in range(itertimes):
+    #         err = 0.
+    #         for i in range(self.d):
+    #             H = self.H_lst[i]
+    #             Psi = dot(self.A_lst[i], H)
+    #             Xi = H.dot(H.T).dot(H)
+    #             for j in range(d):
+    #                 if j == i: continue
+    #                 small, large = map(lambda f: f([i, j]), [min, max])
+    #                 Lambda = self.lambda_dct.get((small, large))
+    #                 S = self.S_dct.get((small, large)), zeros_like(H))
+    #                 self._updateParam(Xi, Psi, S, Lambda, i, j, 'RSS')
+    #                 # if j < i:
+    #                 #     Xi += Lambda/2 * H
+    #                 # elif j > i:
+    #                 #     Xi += Lambda/2 * S.T.dot(S).dot(H)
+    #                 #     S = S.T
+    #                 # Psi += Lambda / 2 * dot(S, self.H_lst[j])
+    #             self.H_lst[i] = H * (Psi / Xi)**(1/4)
+    #             err += mean(abs(H - self.H_lst[i]))
+    #         if err < 10**(-6):
+    #             return True
+    #     return False
 
-    def iter_RSS(self, itertimes=100):
-        for itr in range(itertimes):
-            err = 0.
-            for i in range(self.d):
-                H = self.H_lst[i]
-                Psi = dot(self.A_lst[i], H)
-                Xi = H.dot(H.T).dot(H)
-                for j in range(d):
-                    if j == i: continue
-                    small, large = map(lambda f: f([i, j]), [min, max])
-                    Lambda = self.lambda_dct.get((small, large))
-                    S = self.S_dct.get((small, large)), zeros_like(H))
-                    if j < i:
-                        Xi += Lambda/2 * H
-                    elif j > i:
-                        Xi += Lambda/2 * S.T.dot(S).dot(H)
-                        S = S.T
-                    Psi += Lambda / 2 * dot(S, self.H_lst[j])
-                self.H_lst[i] = H * (Psi / Xi)**(1/4)
-                err += mean(abs(H - self.H_lst[i]))
-            if err < 10**(-6):
-                return True
-        return False
-
-    def iter_CD(self, itertimes=100):
+    def iter(self, itertimes=100, lossFunc):
+        assert lossFunc in ('CD', 'RSS')
         for itr in range(itertimes):
             err = 0.
             for i in range(self.d):
@@ -54,23 +57,35 @@ class CGC(object):
                     small, large = map(lambda f: f([i, j]), [min, max])
                     Lambda = self.lambda_dct.get((small, large))
                     S = self.S_dct.get((small, large)), zeros_like(Xi))
-                    # increment Xi
-                    if j < i:
-                        F1 = H
-                    elif j > i:
-                        F1 = S.T.dot(S).dot(H)
-                        S = S.T
-                    Xi += Lambda * F1.dot(F1.T).dot(H)
-                    # increment Psi
-                    F2 = S.dot(self.H_lst[j])
-                    Psi += Lambda * F2.dot(F2.T).dot(H)
+                    # 根据不同 loss function 对Psi和Xi进行不同的更新
+                    self._updateParam(Xi, Psi, S, Lambda, i, j, lossFunc)
                 self.H_lst[i] = H * (Psi / Xi)**(1/4)
                 err += mean(abs(H - self.H_lst[i]))
             if err < 10**(-6):
                 return True
         return False
 
+    def _updateParam(self, Xi, Psi, S, Lambda, pi_, j, lossFunc):
+        if lossFunc == 'RSS':
+            if j < pi_:
+                Xi += Lambda/2 * H
+            elif j > pi_:
+                Xi += Lambda/2 * S.T.dot(S).dot(H)
+                S = S.T
+            Psi += Lambda / 2 * dot(S, self.H_lst[j])
+        elif lossFunc == 'CD':
+            # increment Xi
+            if j < pi_:
+                F1 = H
+            elif j > pi_:
+                F1 = S.T.dot(S).dot(H)
+                S = S.T
+            Xi += Lambda * F1.dot(F1.T).dot(H)
+            # increment Psi
+            F2 = S.dot(self.H_lst[j])
+            Psi += Lambda * F2.dot(F2.T).dot(H)
+
     @classmethod
-    def _normalize(cls, A):
+    def _normalizeAffMat(cls, A):
     # normalize affinity matrix by Frobenius norm
         return A / sum(A**2)

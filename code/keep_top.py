@@ -59,13 +59,13 @@ def gen_graph_profile():
     for sp in SPECIES:
         if sp in skip: continue
         prf = keep_top(sp, dl=[5,8,10], ret_arr=False)
-        with open(GRAPH_PRF[sp], 'w') as fh:
+        with open(GRAPH_PRF(sp), 'w') as fh:
             fh.write(json.dumps(prf, indent=4))
 
 
 if __name__ == '__main__':
-    skip = []
-    for sp in SPECIES:
-        if sp in skip: continue
-        keep_top(sp, dl=[5], fnl=[FINAL_FILE[sp]], ret_arr=False)
-    # gen_graph_profile()
+    # skip = []
+    # for sp in SPECIES:
+    #     if sp in skip: continue
+    #     keep_top(sp, dl=[5], fnl=[FINAL_FILE[sp]], ret_arr=False)
+    gen_graph_profile()

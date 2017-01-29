@@ -1,5 +1,6 @@
 # coding: utf-8
 import numpy as np
+from datetime import *
 
 BASE_DIR = '/Users/gaoshiyu/desktop/LB/Datasets'
 BASE_DIR1 = '/Volumes/GSY_SS/LB/'
@@ -24,19 +25,14 @@ NPY_FILE = dict(zip(
 
 GRAPH_FILE = dict(zip(
     SPECIES,
-    map(lambda s: BASE_DIR + _fn_fmt.replace('cut_', 'graph_') % s,
+    map(lambda s: BASE_DIR
+                  + _fn_fmt.replace('cut_', 'graph_').replace('.csv', '') % s,
         SPECIES)
 ))
 
 GRAPH_FILE_NPY = dict(zip(
     SPECIES,
-    map(lambda s: GRAPH_FILE[s].replace('.csv', '.npy'),
-        SPECIES)
-))
-
-GRAPH_FILE_GZ = dict(zip(
-    SPECIES,
-    map(lambda sp: GRAPH_FILE[sp] + '.gz',
+    map(lambda s: GRAPH_FILE[s] + '.npy',
         SPECIES)
 ))
 
@@ -50,13 +46,12 @@ FINAL_FILE = dict(zip(
 def FINAL_GRAPH(species):
     return np.load(FINAL_FILE[species]+'.npz')['arr']
 
-_GRAPH_PRF = BASE_DIR + '/profile_graph.json'
-GRAPH_PRF = dict(zip(
-    SPECIES,
-    map(lambda s: (BASE_DIR
-                   + '/profile_graph_%s.json' % s),
-        SPECIES)
-))
+def _GRAPH_PRF():
+    return BASE_DIR + '/profile_graph_{}.json'.format(datetime.now().date())
+
+def GRAPH_PRF(species):
+    assert species in SPECIES
+    return BASE_DIR + '/profile_graph_{}_{}.json'.format(species, datetime.now().date())
 
 ZIDX_FILE = dict(zip(
     SPECIES,
