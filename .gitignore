@@ -4,6 +4,7 @@
 *.gz
 *.txt
 *.json
+*.pdf
 
 *.csv*
 *.swp

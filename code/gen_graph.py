@@ -1,9 +1,9 @@
 # coding: utf-8
 from numpy import *
+
 from consts import (GRAPH_FILE, SPECIES, SPECIES_REL, NPY_FILE, BASE_DIR,
+                    ZIDX,
                     ZIDX_FILE, REL_FILE, ORI_GENE_FILE, REL_MAT_FILE)
-
-
 from Alg.pearson import Pearson as _P
 
 
@@ -36,11 +36,13 @@ def gen_relation_mat(species, savefn=None):
 
     names = []
     for sp in species:
-        names.append(
-            loadtxt(ORI_GENE_FILE[sp], delimiter=',', skiprows=1,
-                    dtype=str, usecols=[0]
-                    ).tolist()
-        )
+        name = loadtxt(ORI_GENE_FILE[sp], delimiter=',', skiprows=1,
+                       dtype=str, usecols=[0]
+                       )
+        idx = sorted(list(
+            set(range(len(name))) - set(ZIDX[sp])
+        ))
+        names.append(name[idx].tolist())
 
     rel_mat = zeros([len(names[0]), len(names[1])])
     for r in range(arr.shape[0]):
@@ -57,7 +59,7 @@ def gen_relation_mat(species, savefn=None):
     rel_mat = rel_mat / Sum
 
     if savefn:
-        savez_compressed(savefn, rel_mat)
+        savez_compressed(savefn, arr=rel_mat)
     return rel_mat
 
 
@@ -78,10 +80,8 @@ def test_zero(species):
 
 
 if __name__ == '__main__':
-    # for i in range(len(SPECIES)):
-    #     for j in range(i+1, len(SPECIES)):
-    #         sp1, sp2 = SPECIES[i], SPECIES[j]
-    #         arr = gen_relation_mat([sp1, sp2],
-    #                                savefn=REL_MAT_FILE(sp1, sp2))
-    for sp in SPECIES:
-        gen_graph(sp, _P.PearsonMat1)
+    for i in range(len(SPECIES)):
+        for j in range(i+1, len(SPECIES)):
+            sp1, sp2 = SPECIES[i], SPECIES[j]
+            arr = gen_relation_mat([sp1, sp2],
+                                   savefn=REL_MAT_FILE(sp1, sp2))

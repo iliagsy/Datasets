@@ -37,13 +37,17 @@ def keep_top(species, PM=None, dl=[5], fnl=None, ret_arr=True):
     nV = PM.shape[0]
     for d,savefn in zip(dl, fnl):
         PM_f = keep_top_d(PM, d)
-        nE = sum(PM_f!=0)
+        nE = count_nonzero(PM_f) / 2
+        degrees = add.reduce(PM_f!=0, axis=1) # count_nonzero(PM_f, axis=1) --new in 1.12.0
+        average_degree = np.mean(degrees)
+        largest_degree = np.max(degrees)
         prf = {
             'd': d,
             'species': species,
             'nE': nE,
             'nV': nV,
-            'nE_per_V': float(nE) / nV
+            'average_degree': average_degree,
+            'largest_degree': largest_degree
         }
         if not ret_arr and not savefn:
             prfs.append(prf); continue
@@ -64,8 +68,8 @@ def gen_graph_profile():
 
 
 if __name__ == '__main__':
-    # skip = []
-    # for sp in SPECIES:
-    #     if sp in skip: continue
-    #     keep_top(sp, dl=[5], fnl=[FINAL_FILE[sp]], ret_arr=False)
-    gen_graph_profile()
+    skip = []
+    for sp in SPECIES:
+        if sp in skip: continue
+        keep_top(sp, dl=[5], fnl=[FINAL_FILE[sp]], ret_arr=False)
+    # gen_graph_profile()

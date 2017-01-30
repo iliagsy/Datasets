@@ -1,5 +1,6 @@
 # coding: utf-8
 import numpy as np
+from numpy import *
 from datetime import *
 
 BASE_DIR = '/Users/gaoshiyu/desktop/LB/Datasets'
@@ -66,5 +67,12 @@ for sp in SPECIES:
 REL_FILE = BASE_DIR + '/LB-Modencode.merged.orth20120611_wfh_comm_all.csv'
 
 def REL_MAT_FILE(sp1, sp2):
-    assert sp1 in SPECIES and sp2 in SPECIES
     return BASE_DIR + '/rel_mat_{}_{}'.format(sp1, sp2)
+
+def REL_MAT(t):
+    sp1, sp2 = map(SPECIES.__getitem__, t)
+    try:
+        return load(REL_MAT_FILE(sp1, sp2)+'.npz')['arr']
+    except:
+        sp1,sp2 = sp2,sp1
+        return load(REL_MAT_FILE(sp1, sp2)+'.npz')['arr'].T

@@ -1,5 +1,6 @@
 # coding: utf-8
 # 实现了三个计算PearsonMat的方法：PearsonMat, PearsonMat0, PearsonMat1
+# 尽量使用PearsonMat or PearsonMat1
 import numpy as np
 from numpy import *
 from scipy.stats import pearsonr
