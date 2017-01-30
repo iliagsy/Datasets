@@ -53,7 +53,6 @@ class Pearson(object):
                 if fill: res_arr[j][i] = r
         return res_arr
 
-
     @classmethod
     def _H(cls, arr):
         SX = add.reduce(arr, axis=1)
@@ -63,7 +62,6 @@ class Pearson(object):
         H = np.dot(arr, arr.T) - S / N
         return H
 
-
     @classmethod
     def PearsonMat1(cls, arr):
     # 矩阵计算
@@ -72,7 +70,6 @@ class Pearson(object):
         D.shape = (1, D.shape[0])
         P = H / sqrt(np.dot(D.T, D))
         return P
-
 
     @classmethod
     def PearsonMat(cls, arr, fill=True, ret_p=False):

@@ -52,49 +52,43 @@ class CGC(object):
                 H = self.H_lst[i]
                 Psi = dot(self.A_lst[i], H)
                 Xi = H.dot(H.T).dot(H)
-                for j in range(d):
-                    if j == i: continue
-                    small, large = map(lambda f: f([i, j]), [min, max])
-                    Lambda = self.lambda_dct.get((small, large))
-                    S = self.S_dct.get((small, large)), zeros_like(Xi))
-                    self._updateParam(Xi, Psi, S, Lambda, i, j, lossFunc)
-                    # # increment Xi
-                    # if j < i:
-                    #     F1 = H
-                    # elif j > i:
-                    #     F1 = S.T.dot(S).dot(H)
-                    #     S = S.T
-                    # Xi += Lambda * F1.dot(F1.T).dot(H)
-                    # # increment Psi
-                    # F2 = S.dot(self.H_lst[j])
-                    # Psi += Lambda * F2.dot(F2.T).dot(H)
+
+                self._updateParam(Xi, Psi, i, lossFunc)
+
                 self.H_lst[i] = H * (Psi / Xi)**(1/4)
                 err += mean(abs(H - self.H_lst[i]))
             if err < 10**(-6):
                 return True
         return False
 
-    def _updateParam(self, Xi, Psi, S, Lambda, pi_, j, lossFunc):
-        if lossFunc == 'RSS':
-            if j < pi_:
-                Xi += Lambda/2 * H
-            elif j > pi_:
-                Xi += Lambda/2 * S.T.dot(S).dot(H)
-                S = S.T
-            Psi += Lambda / 2 * dot(S, self.H_lst[j])
-        elif lossFunc == 'CD':
-            # increment Xi
-            if j < pi_:
-                F1 = H
-            elif j > pi_:
-                F1 = S.T.dot(S).dot(H)
-                S = S.T
-            Xi += Lambda * F1.dot(F1.T).dot(H)
-            # increment Psi
-            F2 = S.dot(self.H_lst[j])
-            Psi += Lambda * F2.dot(F2.T).dot(H)
+    def _updateParam(self, Xi, Psi, pi_, lossFunc):
+        for j in range(self.d):
+            if j == pi_: continue
+
+            small, large = map(lambda f: f([pi_, j]), [min, max])
+            Lambda = self.lambda_dct.get((small, large))
+            S = self.S_dct.get((small, large)), zeros_like(Xi))
+
+            if lossFunc == 'RSS':
+                if j < pi_:
+                    Xi += Lambda/2 * H
+                elif j > pi_:
+                    Xi += Lambda/2 * S.T.dot(S).dot(H)
+                    S = S.T
+                Psi += Lambda / 2 * dot(S, self.H_lst[j])
+            elif lossFunc == 'CD':
+                # increment Xi
+                if j < pi_:
+                    F1 = H
+                elif j > pi_:
+                    F1 = S.T.dot(S).dot(H)
+                    S = S.T
+                Xi += Lambda * F1.dot(F1.T).dot(H)
+                # increment Psi
+                F2 = S.dot(self.H_lst[j])
+                Psi += Lambda * F2.dot(F2.T).dot(H)
 
     @classmethod
     def _normalize(cls, A):
-    # normalize affinity matrix by Frobenius norm
+    # normalize by Frobenius norm
         return A / sum(A**2)

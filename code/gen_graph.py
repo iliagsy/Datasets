@@ -84,4 +84,4 @@ if __name__ == '__main__':
     #         arr = gen_relation_mat([sp1, sp2],
     #                                savefn=REL_MAT_FILE(sp1, sp2))
     for sp in SPECIES:
-        gen_graph(sp)
+        gen_graph(sp, _P.PearsonMat1)
