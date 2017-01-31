@@ -6,19 +6,13 @@ import numpy as np
 class CGC(object):
     def __init__(self, A_lst, S_dct, k_lst, lambda_dct, lossFunc):
         d = self.d = len(A_lst)
-        try:
-            assert (len(k_lst) == d
-                    and len(S_dct) == d*(d-1)/2
-                    and len(lambda_dct) == d*(d-1)/2
-                    and lossFunc in ('CD', 'RSS'))
-        except AssertionError:
-            print len(k_lst), len(S_dct), len(lambda_dct), lossFunc; exit()
+        assert (len(k_lst) == d
+                and len(S_dct) == d*(d-1)/2
+                and len(lambda_dct) == d*(d-1)/2
+                and lossFunc in ('CD', 'RSS'))
         self.n_lst = map(lambda arr: arr.shape[0], A_lst)
         for t in S_dct.keys():
-            try:
-                assert S_dct[t].shape == (self.n_lst[t[1]], self.n_lst[t[0]])
-            except AssertionError:
-                print t, S_dct[t].shape
+            assert S_dct[t].shape == (self.n_lst[t[1]], self.n_lst[t[0]])
         self.A_lst = map(CGC._normalize, A_lst)
         self.S_dct = S_dct
         self.k_lst = k_lst
@@ -31,19 +25,21 @@ class CGC(object):
 
     def iter(self, itertimes=100):
         for itr in range(itertimes):
-            err = 0.
+            err = -inf
 
             for i in range(self.d):
-                H = self.H_lst[i]
+                H = np.copy(self.H_lst[i])
                 Psi = zeros_like(H)
                 Xi = zeros_like(H)
                 self._increParam(Xi, Psi, H, i)
                 Psi += dot(self.A_lst[i], H)
                 Xi += H.dot(H.T).dot(H)
-                self.H_lst[i] = H * (Psi / Xi)**(1/4)
+                assert all(Psi/Xi >= 0)
+                self.H_lst[i] = H * (Psi / Xi)**(1./4)
                 del Psi, Xi
                 err = max(err, np.max(abs(H - self.H_lst[i])))
             if err < 10**(-6):
+                print err  # 0.0
                 return itr
         return -1
 
