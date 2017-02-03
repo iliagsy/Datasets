@@ -5,6 +5,7 @@
 *.txt
 *.json
 *.pdf
+*.log
 
 *.csv*
 *.swp

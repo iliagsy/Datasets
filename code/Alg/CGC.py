@@ -1,5 +1,7 @@
 # coding: utf-8
 from numpy import *
+from scipy.sparse import csr_matrix
+import scipy.sparse.linalg as scila
 import numpy as np
 from datetime import *
 import logging
@@ -11,11 +13,11 @@ logger = logging.getLogger('CGC')
 
 
 class CGC(object):
-    def __init__(self, A_lst, S_dct, k_lst, lambda_dct, lossFunc, H_lst=None):
+    def __init__(self, A_lst, S_dct, k_lst, lambda_arr, lossFunc, H_lst=None):
         d = self.d = len(A_lst)
         assert (len(k_lst) == d
                 and len(S_dct) == d*(d-1)/2
-                and len(lambda_dct) == d*(d-1)/2
+                and lambda_arr.shape[0] == d
                 and lossFunc in ('CD', 'RSS'))
         self.n_lst = map(lambda arr: arr.shape[0], A_lst)
         for t in S_dct.keys():
@@ -23,17 +25,17 @@ class CGC(object):
         self.A_lst = map(CGC._normalize, A_lst)
         self.S_dct = S_dct
         self.k_lst = k_lst
-        self.lambda_dct = lambda_dct
+        self.lambda_arr = lambda_arr
         if H_lst is None:
             self.H_lst = []
             for i in range(d):
                 H = -random.rand(self.n_lst[i], self.k_lst[i]) + 1
-                self.H_lst.append(H)
+                self.H_lst.append(matrix(H))
         else:
             self.H_lst = H_lst
         self.lossFunc = lossFunc
 
-    def iter(self, itertimes=100):
+    def iter(self, itertimes=100, TOL=0.5 * 10**(-5)):
         ob = self.objective
         for itr in range(itertimes):
             for i in range(self.d):
@@ -41,18 +43,17 @@ class CGC(object):
                 Psi = zeros_like(H)
                 Xi = zeros_like(H)
                 self._increParam(Xi, Psi, H, i)
-                Psi += dot(self.A_lst[i], H)
+                Psi += self.A_lst[i].dot(H)
                 Xi += H.dot(H.T).dot(H)
                 assert all(Psi/Xi >= 0)  # check
                 self.H_lst[i] = H * (Psi / Xi)**(1./4)
                 del Psi, Xi, H
             ob1 = self.objective; err = ob1-ob
             ob = ob1
-            logger.warn('iter {} obj {} err {}'.format(itr, ob, err))
-            if abs(err) < 0.5 * 10**(-5):
+            logger.warn('iter {} obj {} err {}'.format(itr, ob, err))  # 用来画图
+            if abs(err) < TOL:
                 break
-        self.H_lst = map(CGC._normH, self.H_lst)
-        return itr, err
+        return itr, err, ob
 
     @property
     def objective(self):
@@ -64,42 +65,41 @@ class CGC(object):
                 F = self.S_dct[(i,j)].dot(self.H_lst[i]) - self.H_lst[j]
             elif self.lossFunc == 'CD':
                 F_ = self.S_dct[(i,j)].dot(self.H_lst[i])
-                F = F_.dot(F_.T) - self.H_lst[j].dot(self.H_lst[j].T)
+                F = F_.dot(F_.transpose()) - self.H_lst[j].dot(self.H_lst[j].transpose())
                 del F_
-            ob += self.lambda_dct[(i,j)] * linalg.norm(F)**2
+            ob += self.lambda_arr[i, j] * linalg.norm(F)**2
         return ob
 
     def _increParam(self, Xi, Psi, H, pi_):
         for j in range(self.d):
             if j == pi_: continue
             small, large = map(lambda f: f([pi_, j]), [min, max])
-            Lambda = self.lambda_dct[(small, large)]
+            Lambda = self.lambda_arr[small, large]
             S = self.S_dct[(small, large)]
 
             if self.lossFunc == 'RSS':
                 if j < pi_:
                     Xi += Lambda/2 * H
                 elif j > pi_:
-                    Xi += Lambda/2 * S.T.dot(S).dot(H)
-                    S = S.T
-                Psi += Lambda / 2 * dot(S, self.H_lst[j])
+                    Xi += Lambda/2 * S.transpose().dot(S).dot(H)
+                    S = S.transpose()
+                Psi += Lambda / 2 * S.dot(self.H_lst[j])
             elif self.lossFunc == 'CD':
                 # increment Xi
                 if j < pi_:
                     F1 = H
                 elif j > pi_:
-                    F1 = S.T.dot(S).dot(H)
-                    S = S.T
-                Xi += Lambda * F1.dot(F1.T).dot(H)
+                    F1 = S.transpose().dot(S).dot(H)
+                    S = S.transpose()
+                Xi += Lambda * F1.dot(F1.transpose()).dot(H)
                 # increment Psi
                 F2 = S.dot(self.H_lst[j])
-                Psi += Lambda * F2.dot(F2.T).dot(H)
+                Psi += Lambda * F2.dot(F2.transpose()).dot(H)
 
     @classmethod
     def _normalize(cls, A):
-    # 取绝对值 http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1000117
     # normalize by Frobenius norm
-        return abs(A) / linalg.norm(A)
+        return A / scila.norm(A)
 
     @classmethod
     def _normH(cls, H):
